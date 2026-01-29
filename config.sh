@@ -49,8 +49,6 @@ ICECAST_SOURCE_PASSWORD=hackme   # Source password (you MUST change it!!!)
 ICECAST_RELAY_PASSWORD=hackme    # Relay password (you MUST change it!!!)
 ICECAST_ADMIN_PASSWORD=hackme    # Admin password (you MUST change it!!!)
 ICECAST_HOSTNAME="${DOMAIN}"     # Hostname
-ICECAST_PORT=8000                # HTTP port
-ICECAST_SSL_PORT=8443            # HTTPS port
 
 # templates
 TEMPLATE_ICECAST="templates/icecast.xml.tpl"
