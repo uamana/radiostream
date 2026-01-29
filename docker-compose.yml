@@ -1,0 +1,73 @@
+services:
+  liquidsoap:
+    image: savonet/liquidsoap-alpine:v2.4.2
+    volumes:
+      - ./scripts:/scripts
+      - radio-tmpfs:/tmp/hls
+    entrypoint: /bin/sh
+    command: -c "rm -rf /tmp/hls/* && liquidsoap /scripts/radio.liq"
+    restart: unless-stopped
+    networks:
+      - radio-network
+
+  nginx:
+    build:
+      context: ./.docker/nginx
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/nginx.conf:ro
+      - radio-tmpfs:/tmp/hls:ro
+      - ./certbot/www:/var/www/certbot:ro
+      - ./certbot/conf:/etc/letsencrypt:ro
+    depends_on:
+      - liquidsoap
+    restart: unless-stopped
+    networks:
+      - radio-network
+    environment:
+      - NGINX_CERT_CHECK_INTERVAL=${NGINX_CERT_CHECK_INTERVAL}
+
+  certbot:
+    build:
+      context: ./.docker/certbot
+      dockerfile: Dockerfile
+    volumes:
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/logs:/var/log/letsencrypt
+      - ./certbot/www:/var/www/certbot
+    networks:
+      - radio-network
+    restart: unless-stopped
+    environment:
+      - CERTBOT_RENEW_INTERVAL=${CERTBOT_RENEW_INTERVAL}
+
+  icecast:
+    build:
+      context: ./.docker/icecast
+      dockerfile: Dockerfile
+    volumes:
+      - ./icecast/icecast.xml:/etc/icecast.xml:ro
+      - ./certbot/conf/icecast.pem:/usr/share/icecast/icecast.pem:ro
+    ports:
+      - "8000:8000"
+      - "8443:8443"
+    networks:
+      - radio-network
+    restart: unless-stopped
+    environment:
+      - ICECAST_CERT_CHECK_INTERVAL=${ICECAST_CERT_CHECK_INTERVAL}
+
+networks:
+  radio-network:
+    driver: bridge
+
+volumes:
+  radio-tmpfs:
+    driver: local
+    driver_opts:
+      type: tmpfs
+      o: size=${CONTAINER_TMPFS_SIZE:-16m}
+      device: tmpfs

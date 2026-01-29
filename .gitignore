@@ -1,0 +1,8 @@
+/nginx/*
+!/nginx/.gitkeep
+/icecast/*
+!/icecast/.gitkeep
+/scripts/settings.liq
+/certbot/*
+!/certbot/.gitkeep
+.env
