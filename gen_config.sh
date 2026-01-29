@@ -33,10 +33,10 @@ EOF
 
 echo "==========================================================="
 echo " Radio streaming with Docker"
-echo " https://github.com/uamana/"
+echo " https://github.com/uamana/radiostream"
 echo ""
 echo " This software distributed under the MIT license"
-echo " Copyright (c) 2026 - ADMFM <sergey@admfm.net>"
+echo " Copyright (c) 2026 - ADMFM https://github.com/uamana"
 echo "==========================================================="
 
 if [ -f config.sh ]; then
